@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Authors>Alfonso Segura</Authors>
+    <Company>TryCatch Software Factory</Company>
+    <Description>MongoDb Repositories</Description>
+    <Copyright>Copyright (c) 2021 TryCatch Software Factory</Copyright>
+    <PackageProjectUrl>https://github.com/TryCatch-SoftwareFactory/TryCatch.MongoDb</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>MongoDb, .net-core, repository-pattern</PackageTags>
+    <RepositoryUrl>https://github.com/TryCatch-SoftwareFactory/TryCatch.MongoDb.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="TryCatch" Version="0.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
+</Project>
