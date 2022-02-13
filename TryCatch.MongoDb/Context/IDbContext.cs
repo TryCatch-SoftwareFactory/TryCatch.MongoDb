@@ -17,7 +17,14 @@ namespace TryCatch.MongoDb.Context
         /// </summary>
         /// <typeparam name="TDocument">Type of Mongo Db Document.</typeparam>
         /// <returns>TDocument MongoDB collection.</returns>
-        IMongoCollection<TDocument> Get<TDocument>()
-            where TDocument : class;
+        IMongoCollection<TDocument> Get<TDocument>();
+
+        /// <summary>
+        /// Gets a reference to TDocument MongoCollection.
+        /// </summary>
+        /// <typeparam name="TDocument">Type of Mongo Db Document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <returns>TDocument MongoDB collection.</returns>
+        IMongoCollection<TDocument> Get<TDocument>(string collectionName);
     }
 }

@@ -1,38 +1,35 @@
-﻿// <copyright file="QueryRepositoryTests.cs" company="TryCatch Software Factory">
+﻿// <copyright file="ReadingRepositoryTests.cs" company="TryCatch Software Factory">
 // Copyright © TryCatch Software Factory All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 // </copyright>
 
-namespace TryCatch.MongoDb.UnitTests.Spec
+namespace TryCatch.MongoDb.UnitTests.Linq
 {
     using System;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
     using FluentAssertions;
     using TryCatch.MongoDb.UnitTests.Fixtures;
     using TryCatch.MongoDb.UnitTests.Mocks;
+    using TryCatch.MongoDb.UnitTests.Mocks.Linq;
     using TryCatch.MongoDb.UnitTests.Mocks.Models;
-    using TryCatch.MongoDb.UnitTests.Mocks.Spec;
-    using TryCatch.Patterns.Repositories;
-    using TryCatch.Patterns.Specifications;
     using Xunit;
 
-    public class QueryRepositoryTests : IClassFixture<MongoDbFixture>
+    public class ReadingRepositoryTests : IClassFixture<MongoDbFixture>
     {
-        private readonly ISpecQueryRepository<Vehicle> sut;
+        private readonly VehiclesReadingRepository sut;
 
-        public QueryRepositoryTests(MongoDbFixture mongoDbTest)
+        public ReadingRepositoryTests(MongoDbFixture mongoDbTest)
         {
-            var factory = new VehiclesExpressionFactory();
-
-            this.sut = new VehiclesQueryRepository(mongoDbTest.Context, factory);
+            this.sut = new VehiclesReadingRepository(mongoDbTest.Context);
         }
 
         [Fact]
         public async Task GetAsync_without_where()
         {
             // Arrange
-            ISpecification<Vehicle> where = null;
+            Expression<Func<Vehicle, bool>> where = null;
 
             // Act
             Func<Task> act = async () => await this.sut.GetAsync(where).ConfigureAwait(false);
@@ -48,7 +45,7 @@ namespace TryCatch.MongoDb.UnitTests.Spec
             var expectedEntity = Given.GetVehicle;
 
             // Act
-            var actual = await this.sut.GetAsync(Given.SpecReadWhere).ConfigureAwait(false);
+            var actual = await this.sut.GetAsync(Given.ReadWhere).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeEquivalentTo(expectedEntity);
@@ -58,8 +55,7 @@ namespace TryCatch.MongoDb.UnitTests.Spec
         public async Task GetCountAsync_without_where()
         {
             // Arrange
-            ISpecification<Vehicle> where = null;
-
+            Expression<Func<Vehicle, bool>> where = null;
             var expectedLength = Given.GetVehicles.Count();
 
             // Act
@@ -76,7 +72,7 @@ namespace TryCatch.MongoDb.UnitTests.Spec
             var expected = 1;
 
             // Act
-            var actual = await this.sut.GetCountAsync(Given.SpecReadWhere).ConfigureAwait(false);
+            var actual = await this.sut.GetCountAsync(Given.ReadWhere).ConfigureAwait(false);
 
             // Asserts
             actual.Should().Be(expected);
@@ -120,7 +116,7 @@ namespace TryCatch.MongoDb.UnitTests.Spec
         public async Task GetPageAsync_with_where()
         {
             // Arrange
-            var where = Given.SpecListWhere;
+            var where = Given.ListWhere;
             var expected = Given.GetFilteredVehicles();
 
             // Act
@@ -151,8 +147,8 @@ namespace TryCatch.MongoDb.UnitTests.Spec
         public async Task GetPageAsync_orderBy_field_asc()
         {
             // Arrange
-            var orderBy = Given.SpecOrderBy;
-            var expected = Given.GetVehicles;
+            var orderBy = Given.OrderBy;
+            var expected = Given.GetVehicles.OrderBy(x => x.Name);
 
             // Act
             var actual = await this.sut
@@ -167,12 +163,14 @@ namespace TryCatch.MongoDb.UnitTests.Spec
         public async Task GetPageAsync_orderBy_field_desc()
         {
             // Arrange
-            var orderBy = Given.SpecOrderByDesc;
+            var orderBy = Given.OrderBy;
             var expected = Given.GetVehicles;
 
             // Act
             var actual = await this.sut
-                .GetPageAsync(orderBy: orderBy)
+                .GetPageAsync(
+                    orderBy: orderBy,
+                    orderAsAscending: false)
                 .ConfigureAwait(false);
 
             // Asserts

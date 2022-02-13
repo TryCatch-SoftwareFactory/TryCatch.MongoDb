@@ -1,4 +1,4 @@
-﻿// <copyright file="VehiclesRepository.cs" company="TryCatch Software Factory">
+﻿// <copyright file="VehiclesReadingRepository.cs" company="TryCatch Software Factory">
 // Copyright © TryCatch Software Factory All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 // </copyright>
@@ -11,9 +11,9 @@ namespace TryCatch.MongoDb.UnitTests.Mocks.Linq
     using TryCatch.MongoDb.Linq;
     using TryCatch.MongoDb.UnitTests.Mocks.Models;
 
-    public class VehiclesRepository : Repository<Vehicle>
+    public class VehiclesReadingRepository : ReadingRepository<Vehicle>
     {
-        public VehiclesRepository(IDbContext dbContext)
+        public VehiclesReadingRepository(IDbContext dbContext)
             : base(dbContext)
         {
         }
@@ -21,7 +21,5 @@ namespace TryCatch.MongoDb.UnitTests.Mocks.Linq
         protected override Expression<Func<Vehicle, object>> GetDefaultOrderByQuery() => (x) => x.Name;
 
         protected override Expression<Func<Vehicle, bool>> GetDefaultQuery() => (x) => x.Name.Contains("read-Name");
-
-        protected override Expression<Func<Vehicle, bool>> GetQuery(Vehicle document) => (x) => x.Id == document.Id;
     }
 }

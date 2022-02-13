@@ -15,7 +15,9 @@ namespace TryCatch.MongoDb.UnitTests.Fixtures
     {
         private const string DatabaseName = "dbName";
 
+#pragma warning disable IDE0044 // Agregar modificador de solo lectura
         private static object dbLock = new object();
+#pragma warning restore IDE0044 // Agregar modificador de solo lectura
 
         private static int counter;
 

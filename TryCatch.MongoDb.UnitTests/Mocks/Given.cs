@@ -69,15 +69,27 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
 
         public static ISortSpecification<Vehicle> SpecOrderByDesc => new SortVehicleSpec(false, "Name");
 
-        public static Vehicle VehicleToDeleteLinqCommandTest => new Vehicle
+        public static Vehicle VehicleToDeleteLinqExtendedWritingTest => new Vehicle
         {
             Id = new Guid("9e0d05c6-c702-4427-95bb-927654d87833"),
             Name = "vehicle-2-delete",
         };
 
-        public static Vehicle VehicleToDeleteLinqRepositoryTest => new Vehicle
+        public static Vehicle VehicleToDeleteLinqWritingTest => new Vehicle
+        {
+            Id = new Guid("9e0d05c6-c702-4427-9599-927654d87833"),
+            Name = "vehicle-2-delete",
+        };
+
+        public static Vehicle VehicleToDeleteLinqExtendedRepositoryTest => new Vehicle
         {
             Id = new Guid("666963e8-30eb-4a13-b797-9a4d38717b80"),
+            Name = "vehicle-2-delete",
+        };
+
+        public static Vehicle VehicleToDeleteLinqRepositoryTest => new Vehicle
+        {
+            Id = new Guid("666963e8-30eb-4a13-b797-9a4d44717b80"),
             Name = "vehicle-2-delete",
         };
 
@@ -87,7 +99,11 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
             Name = "not-found-vehicle-to-delete",
         };
 
-        public static ISpecification<Vehicle> VehicleToDeleteSpecRepositoryTest => new DeleteVehicleSpec("0ca4b2ff-f3f6-4906-b261-3731fdee8f9b");
+        public static ISpecification<Vehicle> VehicleToDeleteSpecExtendedRepositoryTest =>
+            new DeleteVehicleSpec("0ca4b2ff-f3f6-4906-b261-3731fdee8f9b");
+
+        public static ISpecification<Vehicle> VehicleToDeleteSpecRepositoryTest =>
+            new DeleteVehicleSpec("172231dc-717e-4edb-b5e4-b85550a2f05d");
 
         public static ISpecification<Vehicle> NotFoundVehicleSpec => new DeleteVehicleSpec("b1c200f6-79f6-4c11-ab7e-13b41a9270e0");
 
@@ -97,7 +113,7 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
             Name = "vehicle-2-update",
         };
 
-        public static IEnumerable<Vehicle> VehiclesToDeleteLinqCommandTest => new[]
+        public static IEnumerable<Vehicle> VehiclesToDeleteLinqExtendedWritingTest => new[]
         {
             new Vehicle() { Id = new Guid("07e3a3cb-5d8f-41cb-b496-f8b308d3321b"), Name = "Vehicles-to-delete" },
             new Vehicle() { Id = new Guid("1748373d-9a52-4cf0-ad9a-429e8b2284a9"), Name = "Vehicles-to-delete" },
@@ -119,8 +135,9 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
             new Vehicle() { Id = new Guid("1cfa17a8-122f-4511-a77e-f9e950d85f3d"), Name = "Vehicles-to-delete" },
         };
 
-        public static IEnumerable<Vehicle> VehiclesToDeleteSpecCommandTest => new[]
+        public static IEnumerable<Vehicle> VehiclesToDeleteSpecExtendedWritingTest => new[]
         {
+            new Vehicle() { Id = new Guid("0ca4b2ff-f3f6-4906-b261-3731fdee8f9b"), Name = "Vehicles-to-delete" },
             new Vehicle() { Id = new Guid("273ffc9d-509f-445f-8dda-df4c944112fb"), Name = "Vehicles-to-delete" },
             new Vehicle() { Id = new Guid("5fc900eb-b874-4b61-8130-e83f04e7a861"), Name = "Vehicles-to-delete" },
             new Vehicle() { Id = new Guid("e7e45698-f719-40d6-85bd-2e6334322731"), Name = "Vehicles-to-delete" },
@@ -132,6 +149,7 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
 
         public static IEnumerable<Vehicle> VehiclesToDeleteSpecRepositoryTest => new[]
         {
+            new Vehicle() { Id = new Guid("0ca4b2ff-f3f6-4906-b261-3731fdee133b"), Name = "Vehicles-to-delete" },
             new Vehicle() { Id = new Guid("8b5dd544-b8ba-4512-85b6-94e9a51497e6"), Name = "Vehicles-to-delete" },
             new Vehicle() { Id = new Guid("f2ca41a2-74d2-4fd5-9c4b-7b36b90c6d37"), Name = "Vehicles-to-delete" },
             new Vehicle() { Id = new Guid("59f836db-ed20-4363-a386-79b083145d34"), Name = "Vehicles-to-delete" },
@@ -162,22 +180,23 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
 
             collection.InsertMany(GetVehicles, options);
 
-            collection.InsertMany(VehiclesToDeleteLinqCommandTest, options);
+            collection.InsertMany(VehiclesToDeleteLinqExtendedWritingTest, options);
             collection.InsertMany(VehiclesToDeleteLinqRepositoryTest, options);
-            collection.InsertMany(VehiclesToDeleteSpecCommandTest, options);
+            collection.InsertMany(VehiclesToDeleteSpecExtendedWritingTest, options);
             collection.InsertMany(VehiclesToDeleteSpecRepositoryTest, options);
             collection.InsertMany(VehiclesToUpdate, options);
 
-            collection.InsertOne(VehicleToDeleteLinqCommandTest, oneOptions);
+            collection.InsertOne(VehicleToDeleteLinqExtendedWritingTest, oneOptions);
+            collection.InsertOne(VehicleToDeleteLinqWritingTest, oneOptions);
             collection.InsertOne(VehicleToDeleteLinqRepositoryTest, oneOptions);
+            collection.InsertOne(VehicleToDeleteLinqExtendedRepositoryTest, oneOptions);
             collection.InsertOne(VehicleToUpdate, oneOptions);
 
             var vehicleToDeleteSpectRepositoryTest = new Vehicle()
             {
-                Id = new Guid("0ca4b2ff-f3f6-4906-b261-3731fdee8f9b"),
+                Id = new Guid("172231dc-717e-4edb-b5e4-b85550a2f05d"),
                 Name = "vehicle-to-delete-spec-repo",
             };
-
             collection.InsertOne(vehicleToDeleteSpectRepositoryTest, oneOptions);
         }
     }
