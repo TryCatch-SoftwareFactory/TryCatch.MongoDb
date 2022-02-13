@@ -16,10 +16,6 @@ namespace TryCatch.MongoDb.UnitTests.Mocks.Models
             this.AddCollection<Vehicle>(typeof(Vehicle).Name);
         }
 
-        public bool Add<TDocument>(string name)
-            where TDocument : class
-        {
-            return this.AddCollection<TDocument>(name);
-        }
+        public bool Add<TDocument>(string name) => this.AddCollection<TDocument>(name);
     }
 }

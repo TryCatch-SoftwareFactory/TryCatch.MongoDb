@@ -37,7 +37,7 @@ namespace TryCatch.MongoDb.UnitTests.Context
         }
 
         [Fact]
-        public void Add_Collection_Ok()
+        public void Create_Collection_Ok()
         {
             // Arrange
 
@@ -49,7 +49,7 @@ namespace TryCatch.MongoDb.UnitTests.Context
         }
 
         [Fact]
-        public void Add_Twice_Collection_Ok()
+        public void Create_Twice_Collection_Ok()
         {
             // Arrange
 
@@ -73,6 +73,18 @@ namespace TryCatch.MongoDb.UnitTests.Context
         }
 
         [Fact]
+        public void Get_Collection_By_Name_Ok()
+        {
+            // Arrange
+
+            // Act
+            var actual = this.sut.Get<Vehicle>("Vehicle");
+
+            // Asserts
+            actual.Should().NotBeNull();
+        }
+
+        [Fact]
         public void Get_Not_Found_Collection_Ok()
         {
             // Arrange
@@ -82,6 +94,21 @@ namespace TryCatch.MongoDb.UnitTests.Context
 
             // Asserts
             actual.Should().Throw<CollectionNotFoundException>();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void Get_Collection_Without_Name(string collectionName)
+        {
+            // Arrange
+
+            // Act
+            Action actual = () => _ = this.sut.Get<Vehicle>(collectionName);
+
+            // Asserts
+            actual.Should().Throw<ArgumentException>();
         }
     }
 }

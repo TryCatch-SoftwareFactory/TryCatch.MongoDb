@@ -1,4 +1,4 @@
-﻿// <copyright file="Repository{TEntity}.cs" company="TryCatch Software Factory">
+﻿// <copyright file="ExtendedRepository{TDocument}.cs" company="TryCatch Software Factory">
 // Copyright © TryCatch Software Factory All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 // </copyright>
@@ -13,38 +13,32 @@ namespace TryCatch.MongoDb.Linq
     using System.Threading.Tasks;
     using MongoDB.Driver;
     using TryCatch.MongoDb.Context;
-    using TryCatch.Patterns.Repositories;
+    using TryCatch.Patterns.Repositories.Linq;
     using TryCatch.Validators;
 
     /// <summary>
-    /// Abstract implementation of repository.
+    /// Abstract repository of IRepository{TDocument}.
     /// </summary>
-    /// <typeparam name="TEntity">Type of document.</typeparam>
-    public abstract class Repository<TEntity> : ILinqRepository<TEntity>
-        where TEntity : class
+    /// <typeparam name="TDocument">Type of document.</typeparam>
+    public abstract class ExtendedRepository<TDocument> : IExtendedRepository<TDocument>
     {
         private const int DefaultLimit = 1000;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Repository{TEntity}"/> class.
+        /// Initializes a new instance of the <see cref="ExtendedRepository{TDocument}"/> class.
         /// </summary>
         /// <param name="dbContext">IDbContext reference.</param>
-        /// <param name="expressionsFactory">Reference to expressions factory.</param>
-        protected Repository(IDbContext dbContext, IExpressionsFactory<TEntity> expressionsFactory)
+        protected ExtendedRepository(IDbContext dbContext)
         {
             ArgumentsValidator.ThrowIfIsNull(dbContext);
-            ArgumentsValidator.ThrowIfIsNull(expressionsFactory);
 
-            this.ExpressionsFactory = expressionsFactory;
-            this.Documents = dbContext.Get<TEntity>();
+            this.Documents = dbContext.Get<TDocument>();
         }
 
-        protected IMongoCollection<TEntity> Documents { get; }
-
-        protected IExpressionsFactory<TEntity> ExpressionsFactory { get; }
+        protected IMongoCollection<TDocument> Documents { get; }
 
         /// <inheritdoc />
-        public async Task<bool> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async virtual Task<bool> CreateAsync(TDocument entity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -60,7 +54,7 @@ namespace TryCatch.MongoDb.Linq
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public async virtual Task<bool> CreateAsync(IEnumerable<TDocument> entities, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -86,40 +80,34 @@ namespace TryCatch.MongoDb.Linq
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddOrUpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async virtual Task<bool> CreateOrUpdateAsync(TDocument entity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             ArgumentsValidator.ThrowIfIsNull(entity);
 
-            var where = this.ExpressionsFactory.GetWhereByQueryName(QueriesNames.UpdateOne, entity);
+            var where = this.GetQuery(entity);
 
-            var exists = await this.Documents
-                .CountDocumentsAsync(where, new CountOptions(), cancellationToken)
+            var options = new ReplaceOptions()
+            {
+                IsUpsert = true,
+            };
+
+            var result = await this.Documents
+                .ReplaceOneAsync(where, entity, options, cancellationToken)
                 .ConfigureAwait(false);
 
-            var resultFlag = false;
-
-            if (exists == 1)
-            {
-                resultFlag = await this.UpdateAsync(entity, cancellationToken).ConfigureAwait(false);
-            }
-            else if (exists == 0)
-            {
-                resultFlag = await this.AddAsync(entity, cancellationToken).ConfigureAwait(false);
-            }
-
-            return resultFlag;
+            return result.ModifiedCount > 0 || (result.UpsertedId != null);
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async virtual Task<bool> DeleteAsync(TDocument entity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             ArgumentsValidator.ThrowIfIsNull(entity);
 
-            var where = this.ExpressionsFactory.GetWhereByQueryName(QueriesNames.DeleteOne, entity);
+            var where = this.GetQuery(entity);
 
             var result = await this.Documents.DeleteOneAsync(where, cancellationToken).ConfigureAwait(false);
 
@@ -127,7 +115,7 @@ namespace TryCatch.MongoDb.Linq
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public async virtual Task<bool> DeleteAsync(IEnumerable<TDocument> entities, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -137,7 +125,7 @@ namespace TryCatch.MongoDb.Linq
 
             if (entities.Any())
             {
-                var where = this.ExpressionsFactory.GetWhereByQueryName(QueriesNames.DeleteMany, entities);
+                var where = this.GetManyQuery(entities);
 
                 var result = await this.Documents
                     .DeleteManyAsync(where, cancellationToken)
@@ -150,16 +138,16 @@ namespace TryCatch.MongoDb.Linq
         }
 
         /// <inheritdoc />
-        public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> where, CancellationToken cancellationToken = default)
+        public async virtual Task<TDocument> GetAsync(Expression<Func<TDocument, bool>> spec, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            ArgumentsValidator.ThrowIfIsNull(where);
+            ArgumentsValidator.ThrowIfIsNull(spec);
 
-            var options = new FindOptions<TEntity> { };
+            var options = new FindOptions<TDocument> { };
 
             var result = await this.Documents
-                .FindAsync(where, options, cancellationToken)
+                .FindAsync(spec, options, cancellationToken)
                 .ConfigureAwait(false);
 
             return await result
@@ -168,23 +156,23 @@ namespace TryCatch.MongoDb.Linq
         }
 
         /// <inheritdoc />
-        public async Task<long> GetCountAsync(Expression<Func<TEntity, bool>> where = null, CancellationToken cancellationToken = default)
+        public async virtual Task<long> GetCountAsync(Expression<Func<TDocument, bool>> spec = null, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            where ??= this.ExpressionsFactory.GetWhereByQueryName(QueriesNames.DefaultCount);
+            spec ??= this.GetDefaultQuery();
 
             return await this.Documents
-                .CountDocumentsAsync(where, new CountOptions(), cancellationToken)
+                .CountDocumentsAsync(spec, new CountOptions(), cancellationToken)
                 .ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetPageAsync(
+        public async virtual Task<IEnumerable<TDocument>> GetPageAsync(
             int offset = 1,
             int limit = DefaultLimit,
-            Expression<Func<TEntity, bool>> where = null,
-            Expression<Func<TEntity, object>> orderBy = null,
+            Expression<Func<TDocument, bool>> where = null,
+            Expression<Func<TDocument, object>> orderBy = null,
             bool orderAsAscending = true,
             CancellationToken cancellationToken = default)
         {
@@ -193,10 +181,10 @@ namespace TryCatch.MongoDb.Linq
             ArgumentsValidator.ThrowIfIsLessThan(1, offset, $"Offset value is invalid: {offset}");
             ArgumentsValidator.ThrowIfIsLessThan(1, limit, $"Limit value is invalid: {limit}");
 
-            where ??= this.ExpressionsFactory.GetWhereByQueryName(QueriesNames.DefaultPage);
-            orderBy ??= this.ExpressionsFactory.GetSortByByQueryName(QueriesNames.DefaultPage);
+            where ??= this.GetDefaultQuery();
+            orderBy ??= this.GetDefaultOrderByQuery();
 
-            var options = new FindOptions<TEntity>()
+            var options = new FindOptions<TDocument>()
             {
                 Skip = offset > 1 ? offset : 0,
                 Limit = limit,
@@ -213,13 +201,13 @@ namespace TryCatch.MongoDb.Linq
         }
 
         /// <inheritdoc />
-        public async Task<bool> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async Task<bool> UpdateAsync(TDocument entity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             ArgumentsValidator.ThrowIfIsNull(entity);
 
-            var where = this.ExpressionsFactory.GetWhereByQueryName(QueriesNames.UpdateOne, entity);
+            var where = this.GetQuery(entity);
 
             var options = new ReplaceOptions()
             {
@@ -234,7 +222,7 @@ namespace TryCatch.MongoDb.Linq
         }
 
         /// <inheritdoc />
-        public async Task<bool> UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public async Task<bool> UpdateAsync(IEnumerable<TDocument> entities, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -247,13 +235,8 @@ namespace TryCatch.MongoDb.Linq
                 var options = new BulkWriteOptions() { IsOrdered = false };
 
                 var updates = entities
-                    .Select(x =>
-                    {
-                        var where = this.ExpressionsFactory.GetWhereByQueryName(QueriesNames.UpdateOne, x);
-
-                        return new ReplaceOneModel<TEntity>(where, x);
-                    })
-                    .ToList<WriteModel<TEntity>>();
+                    .Select(x => new ReplaceOneModel<TDocument>(this.GetQuery(x), x))
+                    .ToList<WriteModel<TDocument>>();
 
                 var result = await this.Documents
                     .BulkWriteAsync(updates, options, cancellationToken)
@@ -265,10 +248,18 @@ namespace TryCatch.MongoDb.Linq
             return resultFlag;
         }
 
-        private static SortDefinition<TEntity> GetSortDefinition(
+        protected abstract Expression<Func<TDocument, bool>> GetQuery(TDocument document);
+
+        protected abstract Expression<Func<TDocument, bool>> GetManyQuery(IEnumerable<TDocument> documents);
+
+        protected abstract Expression<Func<TDocument, bool>> GetDefaultQuery();
+
+        protected abstract Expression<Func<TDocument, object>> GetDefaultOrderByQuery();
+
+        private static SortDefinition<TDocument> GetSortDefinition(
             bool orderAsAscending,
-            Expression<Func<TEntity, object>> orderBy) => orderAsAscending
-                ? Builders<TEntity>.Sort.Ascending(orderBy)
-                : Builders<TEntity>.Sort.Descending(orderBy);
+            Expression<Func<TDocument, object>> orderBy) => orderAsAscending
+                ? Builders<TDocument>.Sort.Ascending(orderBy)
+                : Builders<TDocument>.Sort.Descending(orderBy);
     }
 }

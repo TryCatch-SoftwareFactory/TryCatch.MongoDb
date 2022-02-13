@@ -1,4 +1,4 @@
-﻿// <copyright file="CommandRepositoryTests.cs" company="TryCatch Software Factory">
+﻿// <copyright file="ExtendedWritingRepositoryTests.cs" company="TryCatch Software Factory">
 // Copyright © TryCatch Software Factory All rights reserved.
 // Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
 // </copyright>
@@ -16,73 +16,71 @@ namespace TryCatch.MongoDb.UnitTests
     using TryCatch.MongoDb.UnitTests.Mocks.Models;
     using Xunit;
 
-    public class CommandRepositoryTests : IClassFixture<MongoDbFixture>
+    public class ExtendedWritingRepositoryTests : IClassFixture<MongoDbFixture>
     {
-        private const string TestName = "LINQ-COMMAND-REPOSITORY-TEST";
+        private const string TestName = "LINQ-ExtendedWriting-REPOSITORY-TEST";
 
-        private readonly VehiclesCommandRepository sut;
+        private readonly VehiclesExtendedWritingRepository sut;
 
-        public CommandRepositoryTests(MongoDbFixture mongoDbTest)
+        public ExtendedWritingRepositoryTests(MongoDbFixture mongoDbTest)
         {
-            var factory = new VehiclesExpressionFactory();
-
-            this.sut = new VehiclesCommandRepository(mongoDbTest.Context, factory);
+            this.sut = new VehiclesExtendedWritingRepository(mongoDbTest.Context);
         }
 
         [Fact]
-        public async Task Add_without_entity()
+        public async Task Create_without_entity()
         {
             // Arrange
             Vehicle entity = null;
 
             // Act
-            Func<Task> act = async () => await this.sut.AddAsync(entity).ConfigureAwait(false);
+            Func<Task> act = async () => await this.sut.CreateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task Add_ok()
+        public async Task Create_ok()
         {
             // Arrange
             var entity = DocumentsFactory.GetDocument<Vehicle>();
 
             // Act
-            var actual = await this.sut.AddAsync(entity).ConfigureAwait(false);
+            var actual = await this.sut.CreateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeTrue();
         }
 
         [Fact]
-        public async Task AddOrUpdate_without_entity()
+        public async Task CreateOrUpdate_without_entity()
         {
             // Arrange
             Vehicle entity = null;
 
             // Act
-            Func<Task> act = async () => await this.sut.AddOrUpdateAsync(entity).ConfigureAwait(false);
+            Func<Task> act = async () => await this.sut.CreateOrUpdateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task AddOrUpdate_new_entity_ok()
+        public async Task CreateOrUpdate_new_entity_ok()
         {
             // Arrange
             var entity = DocumentsFactory.GetDocument<Vehicle>();
 
             // Act
-            var actual = await this.sut.AddOrUpdateAsync(entity).ConfigureAwait(false);
+            var actual = await this.sut.CreateOrUpdateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeTrue();
         }
 
         [Fact]
-        public async Task AddOrUpdate_old_entity_ok()
+        public async Task CreateOrUpdate_old_entity_ok()
         {
             // Arrange
             var entity = Given.VehicleToUpdate;
@@ -90,46 +88,46 @@ namespace TryCatch.MongoDb.UnitTests
             entity.Name = $"{entity.Name}-MODIFIED-{TestName}-2";
 
             // Act
-            var actual = await this.sut.AddOrUpdateAsync(entity).ConfigureAwait(false);
+            var actual = await this.sut.CreateOrUpdateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeTrue();
         }
 
         [Fact]
-        public async Task Add_without_entities()
+        public async Task Create_without_entities()
         {
             // Arrange
             IEnumerable<Vehicle> entities = null;
 
             // Act
-            Func<Task> act = async () => await this.sut.AddAsync(entities).ConfigureAwait(false);
+            Func<Task> act = async () => await this.sut.CreateAsync(entities).ConfigureAwait(false);
 
             // Asserts
             await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task Add_with_empty_entities()
+        public async Task Create_with_empty_entities()
         {
             // Arrange
             var entities = Array.Empty<Vehicle>();
 
             // Act
-            var actual = await this.sut.AddAsync(entities).ConfigureAwait(false);
+            var actual = await this.sut.CreateAsync(entities).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeFalse();
         }
 
         [Fact]
-        public async Task Add_entities_ok()
+        public async Task Create_entities_ok()
         {
             // Arrange
             var entities = DocumentsFactory.GetDocuments<Vehicle>(10);
 
             // Act
-            var actual = await this.sut.AddAsync(entities).ConfigureAwait(false);
+            var actual = await this.sut.CreateAsync(entities).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeTrue();
@@ -247,7 +245,7 @@ namespace TryCatch.MongoDb.UnitTests
         public async Task Delete_entity_ok()
         {
             // Arrange
-            var entity = Given.VehicleToDeleteLinqCommandTest;
+            var entity = Given.VehicleToDeleteLinqExtendedWritingTest;
 
             // Act
             var actual = await this.sut.DeleteAsync(entity).ConfigureAwait(false);
@@ -263,7 +261,7 @@ namespace TryCatch.MongoDb.UnitTests
             IEnumerable<Vehicle> entities = null;
 
             // Act
-            Func<Task> act = async () => await this.sut.AddAsync(entities).ConfigureAwait(false);
+            Func<Task> act = async () => await this.sut.CreateAsync(entities).ConfigureAwait(false);
 
             // Asserts
             await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
@@ -286,7 +284,7 @@ namespace TryCatch.MongoDb.UnitTests
         public async Task Delete_entities_ok()
         {
             // Arrange
-            var entities = Given.VehiclesToDeleteLinqCommandTest;
+            var entities = Given.VehiclesToDeleteLinqExtendedWritingTest;
 
             // Act
             var actual = await this.sut.DeleteAsync(entities).ConfigureAwait(false);

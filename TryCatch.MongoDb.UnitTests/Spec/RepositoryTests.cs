@@ -14,7 +14,7 @@ namespace TryCatch.MongoDb.UnitTests.Spec
     using TryCatch.MongoDb.UnitTests.Mocks;
     using TryCatch.MongoDb.UnitTests.Mocks.Models;
     using TryCatch.MongoDb.UnitTests.Mocks.Spec;
-    using TryCatch.Patterns.Repositories;
+    using TryCatch.Patterns.Repositories.Spec;
     using TryCatch.Patterns.Specifications;
     using Xunit;
 
@@ -22,69 +22,67 @@ namespace TryCatch.MongoDb.UnitTests.Spec
     {
         private const string TestName = "SPEC-REPOSITORY-TEST";
 
-        private readonly ISpecRepository<Vehicle> sut;
+        private readonly IRepository<Vehicle> sut;
 
         public RepositoryTests(MongoDbFixture mongoDbTest)
         {
-            var factory = new VehiclesExpressionFactory();
-
-            this.sut = new VehiclesRepository(mongoDbTest.Context, factory);
+            this.sut = new VehiclesRepository(mongoDbTest.Context);
         }
 
         [Fact]
-        public async Task Add_without_entity()
+        public async Task Create_without_entity()
         {
             // Arrange
             Vehicle entity = null;
 
             // Act
-            Func<Task> act = async () => await this.sut.AddAsync(entity).ConfigureAwait(false);
+            Func<Task> act = async () => await this.sut.CreateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task Add_ok()
+        public async Task Create_ok()
         {
             // Arrange
             var entity = DocumentsFactory.GetDocument<Vehicle>();
 
             // Act
-            var actual = await this.sut.AddAsync(entity).ConfigureAwait(false);
+            var actual = await this.sut.CreateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeTrue();
         }
 
         [Fact]
-        public async Task AddOrUpdate_without_entity()
+        public async Task CreateOrUpdate_without_entity()
         {
             // Arrange
             Vehicle entity = null;
 
             // Act
-            Func<Task> act = async () => await this.sut.AddOrUpdateAsync(entity).ConfigureAwait(false);
+            Func<Task> act = async () => await this.sut.CreateOrUpdateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task AddOrUpdate_new_entity_ok()
+        public async Task CreateOrUpdate_new_entity_ok()
         {
             // Arrange
             var entity = DocumentsFactory.GetDocument<Vehicle>();
 
             // Act
-            var actual = await this.sut.AddOrUpdateAsync(entity).ConfigureAwait(false);
+            var actual = await this.sut.CreateOrUpdateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeTrue();
         }
 
         [Fact]
-        public async Task AddOrUpdate_old_entity_ok()
+        public async Task CreateOrUpdate_old_entity_ok()
         {
             // Arrange
             var entity = Given.VehicleToUpdate;
@@ -92,46 +90,7 @@ namespace TryCatch.MongoDb.UnitTests.Spec
             entity.Name = $"{entity.Name}-MODIFIED-{TestName}-2";
 
             // Act
-            var actual = await this.sut.AddOrUpdateAsync(entity).ConfigureAwait(false);
-
-            // Asserts
-            actual.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task Add_without_entities()
-        {
-            // Arrange
-            IEnumerable<Vehicle> entities = null;
-
-            // Act
-            Func<Task> act = async () => await this.sut.AddAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
-        }
-
-        [Fact]
-        public async Task Add_with_empty_entities()
-        {
-            // Arrange
-            var entities = Array.Empty<Vehicle>();
-
-            // Act
-            var actual = await this.sut.AddAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            actual.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task Add_entities_ok()
-        {
-            // Arrange
-            var entities = DocumentsFactory.GetDocuments<Vehicle>(10);
-
-            // Act
-            var actual = await this.sut.AddAsync(entities).ConfigureAwait(false);
+            var actual = await this.sut.CreateOrUpdateAsync(entity).ConfigureAwait(false);
 
             // Asserts
             actual.Should().BeTrue();
@@ -179,60 +138,6 @@ namespace TryCatch.MongoDb.UnitTests.Spec
         }
 
         [Fact]
-        public async Task Update_without_entities()
-        {
-            // Arrange
-            IEnumerable<Vehicle> entities = null;
-
-            // Act
-            Func<Task> act = async () => await this.sut.UpdateAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
-        }
-
-        [Fact]
-        public async Task Update_with_empty_entities()
-        {
-            // Arrange
-            var entities = Array.Empty<Vehicle>() as IEnumerable<Vehicle>;
-
-            // Act
-            var actual = await this.sut.UpdateAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            actual.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task Update_with_non_exists_entities()
-        {
-            // Arrange
-            var entities = DocumentsFactory.GetDocuments<Vehicle>(10);
-
-            // Act
-            var actual = await this.sut.UpdateAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            actual.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task Update_entities_ok()
-        {
-            // Arrange
-            var entities = Given.VehiclesToUpdate;
-
-            entities = entities.Select(x => new Vehicle() { Id = x.Id, Name = $"{x.Name}-modified-{TestName}" });
-
-            // Act
-            var actual = await this.sut.UpdateAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            actual.Should().BeTrue();
-        }
-
-        [Fact]
         public async Task Delete_without_entity()
         {
             // Arrange
@@ -269,45 +174,6 @@ namespace TryCatch.MongoDb.UnitTests.Spec
 
             // Asserts
             actual.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task Delete_without_entities()
-        {
-            // Arrange
-            IEnumerable<Vehicle> entities = null;
-
-            // Act
-            Func<Task> act = async () => await this.sut.AddAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            await act.Should().ThrowAsync<ArgumentNullException>().ConfigureAwait(false);
-        }
-
-        [Fact]
-        public async Task Delete_with_empty_entities()
-        {
-            // Arrange
-            var entities = Array.Empty<Vehicle>();
-
-            // Act
-            var actual = await this.sut.DeleteAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            actual.Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task Delete_entities_ok()
-        {
-            // Arrange
-            var entities = Given.VehiclesToDeleteSpecRepositoryTest;
-
-            // Act
-            var actual = await this.sut.DeleteAsync(entities).ConfigureAwait(false);
-
-            // Asserts
-            actual.Should().BeTrue();
         }
 
         [Fact]

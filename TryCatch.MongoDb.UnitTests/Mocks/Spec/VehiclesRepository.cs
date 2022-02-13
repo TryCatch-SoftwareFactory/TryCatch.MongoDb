@@ -5,15 +5,23 @@
 
 namespace TryCatch.MongoDb.UnitTests.Mocks.Spec
 {
+    using System;
+    using System.Linq.Expressions;
     using TryCatch.MongoDb.Context;
     using TryCatch.MongoDb.Spec;
     using TryCatch.MongoDb.UnitTests.Mocks.Models;
 
     public class VehiclesRepository : Repository<Vehicle>
     {
-        public VehiclesRepository(IDbContext dbContext, VehiclesExpressionFactory expressionFactory)
-            : base(dbContext, expressionFactory)
+        public VehiclesRepository(IDbContext dbContext)
+            : base(dbContext)
         {
         }
+
+        protected override Expression<Func<Vehicle, object>> GetDefaultOrderByQuery() => (x) => x.Name;
+
+        protected override Expression<Func<Vehicle, bool>> GetDefaultQuery() => (x) => x.Name.Contains("read-Name");
+
+        protected override Expression<Func<Vehicle, bool>> GetQuery(Vehicle document) => (x) => x.Id == document.Id;
     }
 }
