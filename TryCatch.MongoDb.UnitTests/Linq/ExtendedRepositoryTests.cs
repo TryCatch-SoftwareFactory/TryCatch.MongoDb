@@ -84,7 +84,7 @@ namespace TryCatch.MongoDb.UnitTests.Linq
         public async Task CreateOrUpdate_old_entity_ok()
         {
             // Arrange
-            var entity = Given.VehicleToUpdate;
+            var entity = Given.VehicleToUpdateWithExtendedRepository;
 
             entity.Name = $"{entity.Name}-MODIFIED-{TestName}-2";
 

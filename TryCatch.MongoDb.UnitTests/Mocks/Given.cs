@@ -113,6 +113,12 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
             Name = "vehicle-2-update",
         };
 
+        public static Vehicle VehicleToUpdateWithExtendedRepository => new Vehicle
+        {
+            Id = new Guid("3ed649b0-bccb-463e-a416-3de20146507f"),
+            Name = "vehicle-3-update",
+        };
+
         public static IEnumerable<Vehicle> VehiclesToDeleteLinqExtendedWritingTest => new[]
         {
             new Vehicle() { Id = new Guid("07e3a3cb-5d8f-41cb-b496-f8b308d3321b"), Name = "Vehicles-to-delete" },
@@ -190,6 +196,7 @@ namespace TryCatch.MongoDb.UnitTests.Mocks
             collection.InsertOne(VehicleToDeleteLinqWritingTest, oneOptions);
             collection.InsertOne(VehicleToDeleteLinqRepositoryTest, oneOptions);
             collection.InsertOne(VehicleToDeleteLinqExtendedRepositoryTest, oneOptions);
+            collection.InsertOne(VehicleToUpdateWithExtendedRepository, oneOptions);
             collection.InsertOne(VehicleToUpdate, oneOptions);
 
             var vehicleToDeleteSpectRepositoryTest = new Vehicle()
