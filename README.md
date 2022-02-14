@@ -4,6 +4,7 @@
 [![Unit Test](https://github.com/TryCatch-SoftwareFactory/TryCatch.MongoDb/actions/workflows/unit-test.yml/badge.svg)](https://github.com/TryCatch-SoftwareFactory/TryCatch.MongoDb/actions/workflows/unit-test.yml)
 [![CodeQL](https://github.com/TryCatch-SoftwareFactory/TryCatch.MongoDb/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/TryCatch-SoftwareFactory/TryCatch.MongoDb/actions/workflows/codeql-analysis.yml)
 [![NuGet Badge](https://buildstats.info/nuget/TryCatch.MongoDb)](https://www.nuget.org/packages/TryCatch.MongoDb/)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/trycatch-github/d329d88d2223613ccf3f9ec704d707b5/raw/trycatch.mongodb-code-coverage.json)
 
 
 MongoDB repositories.
@@ -40,10 +41,16 @@ This library is available as a nuget package https://www.nuget.org/packages/TryC
 [TBD]
 
 ## Contributions
-If you want to contribute to this project just create a pull request. But only pull requests which are matching the code style of this library will be accepted. Before creating a pull request please have a look at the library to get an overview of the required style.
+If you want to contribute to this project just create a pull request. But only pull requests which are matching the code style of this library will be accepted. Before creating a pull request please have a look at the library to get an overview of the required style. Please, refer to our document about the [contributing](CONTRIBUTING.md)
 
 ## Code of conduct
-Please, refer to our document about the [code of conduct](CODE-OF-CONDUCT.md)
+Please, refer to our document about the [code of conduct](CODE_OF_CONDUCT.md)
+
+## Security Policy
+Please, refer to our document about the [security policy](SECURITY.md)
+
+## Support
+Please, refer to our document about the [support policy](SUPPORT.md)
 
 ## License
 MIT License

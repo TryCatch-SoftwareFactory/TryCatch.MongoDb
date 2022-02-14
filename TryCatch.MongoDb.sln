@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		stylecop.json = stylecop.json
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TryCatch.MongoDb", "TryCatch.MongoDb\TryCatch.MongoDb.csproj", "{3564FEC6-4176-4A4D-8378-06BCBB7BFABD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TryCatch.MongoDb", "src\TryCatch.MongoDb\TryCatch.MongoDb.csproj", "{3564FEC6-4176-4A4D-8378-06BCBB7BFABD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TryCatch.MongoDb.UnitTests", "TryCatch.MongoDb.UnitTests\TryCatch.MongoDb.UnitTests.csproj", "{72029916-0EE9-482A-ADBE-078957C9F761}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TryCatch.MongoDb.UnitTests", "tests\TryCatch.MongoDb.UnitTests\TryCatch.MongoDb.UnitTests.csproj", "{72029916-0EE9-482A-ADBE-078957C9F761}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

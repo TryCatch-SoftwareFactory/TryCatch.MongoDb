@@ -18,6 +18,18 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test  -p:CollectCoverage=true -p:CoverletOutput=TestResults/ -p:CoverletOutputFormat=opencover --no-build --verbosity normal
+    - name: Create Test Coverage Badge
+      uses: simon-k/dotnet-code-coverage-badge@v1.0.0
+      id: create_coverage_badge
+      with:
+        label: Code Coverage
+        color: brightgreen
+        path: tests/TryCatch.MongoDb.UnitTests/TestResults/coverage.opencover.xml
+        gist-filename: trycatch.mongodb-code-coverage.json
+        gist-id: d329d88d2223613ccf3f9ec704d707b5
+        gist-auth-token: ${{ secrets.GIST_CQRS_BADGE }}       
+    - name: Print code coverage
+      run: echo "Code coverage percentage ${{steps.create_coverage_badge.outputs.percentage}}%"      

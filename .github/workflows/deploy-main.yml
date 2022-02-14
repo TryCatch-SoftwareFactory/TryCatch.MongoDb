@@ -25,7 +25,7 @@ jobs:
     - name: Test
       run: dotnet test --configuration Release --no-build
     - name: Publish on Github packages
-      run: dotnet nuget push "TryCatch.MongoDb/bin/Release/TryCatch.MongoDb.*.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/TryCatch-SoftwareFactory/index.json"
+      run: dotnet nuget push "src/TryCatch.MongoDb/bin/Release/TryCatch.MongoDb.*.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/TryCatch-SoftwareFactory/index.json" --skip-duplicate
     - name: Publish on Nuget.org packages
-      run: dotnet nuget push "**/Release/TryCatch.MongoDb.*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json"
+      run: dotnet nuget push "**/Release/TryCatch.MongoDb.*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
         
